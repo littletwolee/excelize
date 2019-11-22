@@ -302,24 +302,24 @@ type cView3D struct {
 // cPlotArea directly maps the plotArea element. This element specifies the
 // plot area of the chart.
 type cPlotArea struct {
-	Layout         *string  `xml:"layout"`
-	AreaChart      *cCharts `xml:"areaChart"`
-	Area3DChart    *cCharts `xml:"area3DChart"`
-	BarChart       *cCharts `xml:"barChart"`
-	Bar3DChart     *cCharts `xml:"bar3DChart"`
-	BubbleChart    *cCharts `xml:"bubbleChart"`
-	DoughnutChart  *cCharts `xml:"doughnutChart"`
-	LineChart      *cCharts `xml:"lineChart"`
-	PieChart       *cCharts `xml:"pieChart"`
-	Pie3DChart     *cCharts `xml:"pie3DChart"`
-	RadarChart     *cCharts `xml:"radarChart"`
-	ScatterChart   *cCharts `xml:"scatterChart"`
-	Surface3DChart *cCharts `xml:"surface3DChart"`
-	SurfaceChart   *cCharts `xml:"surfaceChart"`
-	CatAx          []*cAxs  `xml:"catAx"`
-	ValAx          []*cAxs  `xml:"valAx"`
-	SerAx          []*cAxs  `xml:"serAx"`
-	SpPr           *cSpPr   `xml:"spPr"`
+	Layout         *string    `xml:"layout"`
+	AreaChart      *cCharts   `xml:"areaChart"`
+	Area3DChart    *cCharts   `xml:"area3DChart"`
+	BarChart       *cCharts   `xml:"barChart"`
+	Bar3DChart     *cCharts   `xml:"bar3DChart"`
+	BubbleChart    *cCharts   `xml:"bubbleChart"`
+	DoughnutChart  *cCharts   `xml:"doughnutChart"`
+	LineChart      []*cCharts `xml:"lineChart"`
+	PieChart       *cCharts   `xml:"pieChart"`
+	Pie3DChart     *cCharts   `xml:"pie3DChart"`
+	RadarChart     *cCharts   `xml:"radarChart"`
+	ScatterChart   *cCharts   `xml:"scatterChart"`
+	Surface3DChart *cCharts   `xml:"surface3DChart"`
+	SurfaceChart   *cCharts   `xml:"surfaceChart"`
+	CatAx          []*cAxs    `xml:"catAx"`
+	ValAx          []*cAxs    `xml:"valAx"`
+	SerAx          []*cAxs    `xml:"serAx"`
+	SpPr           *cSpPr     `xml:"spPr"`
 }
 
 // cCharts specifies the common element of the chart.
@@ -544,15 +544,19 @@ type formatChartDimension struct {
 
 // formatChart directly maps the format settings of the chart.
 type formatChart struct {
-	Type      string               `json:"type"`
-	Series    []formatChartSeries  `json:"series"`
-	Format    formatPicture        `json:"format"`
-	Dimension formatChartDimension `json:"dimension"`
-	Legend    formatChartLegend    `json:"legend"`
-	Title     formatChartTitle     `json:"title"`
-	XAxis     formatChartAxis      `json:"x_axis"`
-	YAxis     formatChartAxis      `json:"y_axis"`
-	Chartarea struct {
+	Type               string               `json:"type"`
+	Series             []formatChartSeries  `json:"series"`
+	Format             formatPicture        `json:"format"`
+	Dimension          formatChartDimension `json:"dimension"`
+	Legend             formatChartLegend    `json:"legend"`
+	Title              formatChartTitle     `json:"title"`
+	XAxis              formatChartAxis      `json:"x_axis"`
+	YAxis              formatChartAxis      `json:"y_axis"`
+	NeedSecondaryYAxis bool                 `json:"need_2_y_axis"`
+	catAxisIDs         []int                `json:"-"`
+	valAxisIDs         []int                `json:"-"`
+	yReverseOrders     []bool               `json:"-"`
+	Chartarea          struct {
 		Border struct {
 			None bool `json:"none"`
 		} `json:"border"`
@@ -605,6 +609,7 @@ type formatChartLegend struct {
 // formatChartSeries directly maps the format settings of the chart series.
 type formatChartSeries struct {
 	Name       string `json:"name"`
+	Secondary  bool   `json:"secondary"`
 	Categories string `json:"categories"`
 	Values     string `json:"values"`
 	Line       struct {
