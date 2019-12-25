@@ -1501,7 +1501,7 @@ func (f *File) drawChartSeriesVal(v formatChartSeries, formatSet *formatChart) *
 // given data index and format sets.
 func (f *File) drawChartSeriesMarker(i int, formatSet *formatChart) *cMarker {
 	marker := &cMarker{
-		Symbol: &attrValString{Val: "circle"},
+		Symbol: &attrValString{Val: "none"},
 		Size:   &attrValInt{Val: 5},
 	}
 	if i < 6 {
@@ -1521,8 +1521,9 @@ func (f *File) drawChartSeriesMarker(i int, formatSet *formatChart) *cMarker {
 			},
 		}
 	}
-	chartSeriesMarker := map[string]*cMarker{Scatter: marker}
-	return chartSeriesMarker[formatSet.Type]
+	// chartSeriesMarker := map[string]*cMarker{Scatter: marker}
+	// return chartSeriesMarker[formatSet.Type]
+	return marker
 }
 
 // drawChartSeriesXVal provides a function to draw the c:xVal element by given
