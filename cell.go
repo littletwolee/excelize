@@ -469,6 +469,75 @@ func (f *File) MergeCell(sheet, hcell, vcell string) error {
 	return err
 }
 
+func (f *File) UnmergeCell(sheet string, hcell, vcell string) error {
+	xlsx, err := f.workSheetReader(sheet)
+	if err != nil {
+		return err
+	}
+	rect1, err := f.areaRefToCoordinates(hcell + ":" + vcell)
+	if err != nil {
+		return err
+	}
+
+	// Correct the coordinate area, such correct C1:B3 to B1:C3.
+	_ = sortCoordinates(rect1)
+
+	// return nil since no MergeCells in the sheet
+	if xlsx.MergeCells == nil {
+		return nil
+	}
+
+	i := 0
+	for _, cellData := range xlsx.MergeCells.Cells {
+		if cellData == nil {
+			continue
+		}
+		cc := strings.Split(cellData.Ref, ":")
+		if len(cc) != 2 {
+			return fmt.Errorf("invalid area %q", cellData.Ref)
+		}
+
+		rect2, err := f.areaRefToCoordinates(cellData.Ref)
+		if err != nil {
+			return err
+		}
+
+		if isOverlap(rect1, rect2) {
+			continue
+		}
+		xlsx.MergeCells.Cells[i] = cellData
+		i++
+	}
+	xlsx.MergeCells.Cells = xlsx.MergeCells.Cells[:i]
+	return nil
+}
+func cellInRef(cell, ref []int) bool {
+	return cell[0] >= ref[0] && cell[0] <= ref[2] && cell[1] >= ref[1] && cell[1] <= ref[3]
+}
+func isOverlap(rect1, rect2 []int) bool {
+	return cellInRef([]int{rect1[0], rect1[1]}, rect2) ||
+		cellInRef([]int{rect1[2], rect1[1]}, rect2) ||
+		cellInRef([]int{rect1[0], rect1[3]}, rect2) ||
+		cellInRef([]int{rect1[2], rect1[3]}, rect2) ||
+		cellInRef([]int{rect2[0], rect2[1]}, rect1) ||
+		cellInRef([]int{rect2[2], rect2[1]}, rect1) ||
+		cellInRef([]int{rect2[0], rect2[3]}, rect1) ||
+		cellInRef([]int{rect2[2], rect2[3]}, rect1)
+}
+
+func sortCoordinates(coordinates []int) error {
+	if len(coordinates) != 4 {
+		return errors.New("coordinates length must be 4")
+	}
+	if coordinates[2] < coordinates[0] {
+		coordinates[2], coordinates[0] = coordinates[0], coordinates[2]
+	}
+	if coordinates[3] < coordinates[1] {
+		coordinates[3], coordinates[1] = coordinates[1], coordinates[3]
+	}
+	return nil
+}
+
 // SetSheetRow writes an array to row by given worksheet name, starting
 // coordinate and a pointer to array type 'slice'. For example, writes an
 // array to row 6 start with the cell B6 on Sheet1:
